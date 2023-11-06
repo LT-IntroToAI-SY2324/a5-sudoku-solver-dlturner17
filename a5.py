@@ -57,8 +57,10 @@ class Board:
     def __str__(self) -> str:
         """String representation of the board"""
         row_str = ""
+        row_num = 0
         for r in self.rows:
             row_str += f"{r}\n"
+            row_num += 1
 
         return f"num_nums_placed: {self.num_nums_placed}\nboard (rows): \n{row_str}"
 
@@ -139,8 +141,18 @@ class Board:
             column - index of the column to assign
             assignment - value to place at given row, column coordinate
         """
-        pass
+        
+        self.rows[row][column] = assignment 
+        self.num_nums_placed += 1
 
+        for i in range (self.size):
+            remove_if_exists(self.rows[row][i], assignment)
+            remove_if_exists(self.rows[i][column], assignment)
+        
+        for i, j in self.subgrid_coordinates(row, column): 
+            remove_if_exists(self.rows[i][j], assignment)
+    
+ 
 
 def DFS(state: Board) -> Board:
     """Performs a depth first search. Takes a Board and attempts to assign values to
@@ -173,6 +185,16 @@ def BFS(state: Board) -> Board:
 
 
 if __name__ == "__main__":
+    b = Board()
+    print(b)
+    b.print_pretty()
+    b.update(0,0,4)
+    b.update(2,1,7)
+    b.update(0,5,1)
+    b.update(7,1,8)
+    b.print_pretty()
+    print(b)
+
     # uncomment the below lines once you've implemented the board class
    
     # # CODE BELOW HERE RUNS YOUR BFS/DFS
@@ -258,7 +280,7 @@ if __name__ == "__main__":
     # b = Board()
     # #Place the 28 assignments in first_moves on the board.
     # for trip in first_moves:
-    #     b.rows[trip[0]][trip[1]] = trip[2]
+    #     b.update[trip[0]][trip[1]] = trip[2]
     # #NOTE - the above code only *puts* the numbers on the board, but doesn't
     # #   do the work that update does (remove numbers from other lists, etc).
 
