@@ -59,10 +59,12 @@ class Board:
         row_str = ""
         row_num = 0
         for r in self.rows:
-            row_str += f"{r}\n"
-            row_num += 1
+             row_str += f"row {row_num}: {r}\n\n"
+             row_num += 1
 
         return f"num_nums_placed: {self.num_nums_placed}\nboard (rows): \n{row_str}"
+
+
 
     def print_pretty(self):
         """Prints all numbers assigned to cells, excluding lists of possible numbers
@@ -77,6 +79,7 @@ class Board:
                 row_str += "*" if isinstance(x, list) else f"{x}"
 
             row_str += " |\n"
+
 
         row_str += " -------------------------\n"
         print(f"num_nums_placed: {self.num_nums_placed}\nboard (rows): \n{row_str}")
@@ -112,7 +115,7 @@ class Board:
         pos = (0,0)
         for i in range(self.size):
             for j in range(self.size):
-               if isinstance(self.rows[i][j], list) and (self.rows[i][j]) < mini:
+               if isinstance(self.rows[i][j], list) and len(self.rows[i][j]) < mini:
                 #    print(self.rows[i][j])
                    mini = len(self.rows[i][j])
                    pos = (i, j)
@@ -140,7 +143,7 @@ class Board:
         Returns:
             True if we've placed all numbers, False otherwise
         """
-        pass
+        return self.num_nums_placed == self.size * self.size
 
     def update(self, row: int, column: int, assignment: int) -> None:
         """Assigns the given value to the cell given by passed in row and column
@@ -155,15 +158,17 @@ class Board:
             assignment - value to place at given row, column coordinate
         """
         
-        self.rows[row][column] = assignment 
+        self.rows[row][column] = assignment
         self.num_nums_placed += 1
 
-        for i in range (self.size):
+        for i in range(self.size):
             remove_if_exists(self.rows[row][i], assignment)
             remove_if_exists(self.rows[i][column], assignment)
-        
-        for i, j in self.subgrid_coordinates(row, column): 
+
+        for i, j in self.subgrid_coordinates(row, column):
             remove_if_exists(self.rows[i][j], assignment)
+            # print(i, j)
+        # print(self.subgrid_coordinates(row, column))
     
  
 
@@ -179,7 +184,29 @@ def DFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
-    pass
+    the_stack = Stack([state])
+    print(the_stack)
+    while not the_stack.is_empty():
+        print(the_stack)
+        curr = the_stack.pop()
+        if curr.goal_test():
+            return curr
+        elif not curr.failure_test():
+            row, column = curr.find_most_constrained_cell()
+            mcc = curr.rows[row][column]
+            for sel in mcc: 
+                cpy = copy.deepcopy(curr)
+                cpy.update(row, column, sel)
+                print(row, column, sel)
+                the_stack.push(cpy)
+    return None 
+    
+
+
+
+    return None 
+
+
 
 
 def BFS(state: Board) -> Board:
@@ -194,17 +221,18 @@ def BFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
-    pass
+    
 
 
 if __name__ == "__main__":
+    # uncomment the below lines once you've implemented the board class
     b = Board()
     print(b)
     b.print_pretty()
-    b.update(0,0,4)
-    b.update(2,1,7)
-    b.update(0,5,1)
-    b.update(7,1,8)
+    b.update(0, 0, 4)
+    b.update(2, 1, 7)
+    b.update(0, 5, 3)
+    b.update(7, 1, 9)
     b.print_pretty()
     print(b)
 
@@ -213,20 +241,20 @@ if __name__ == "__main__":
     # # CODE BELOW HERE RUNS YOUR BFS/DFS
     # print("<<<<<<<<<<<<<< Solving Sudoku >>>>>>>>>>>>>>")
 
-    # def test_dfs_or_bfs(use_dfs: bool, moves: List[Tuple[int, int, int]]) -> None:
-    #     b = Board()
-    #     # make initial moves to set up board
-    #     for move in moves:
-    #         b.update(*move)
+    def test_dfs_or_bfs(use_dfs: bool, moves: List[Tuple[int, int, int]]) -> None:
+        b = Board()
+        # make initial moves to set up board
+        for move in moves:
+            b.update(*move)
 
-    #     # print initial board
-    #     print("<<<<< Initial Board >>>>>")
-    #     b.print_pretty()
-    #     # solve board
-    #     solution = (DFS if use_dfs else BFS)(b)
-    #     # print solved board
-    #     print("<<<<< Solved Board >>>>>")
-    #     solution.print_pretty()
+        # print initial board
+        print("<<<<< Initial Board >>>>>")
+        b.print_pretty()
+        # solve board
+        solution = (DFS if use_dfs else BFS)(b)
+        # print solved board
+        print("<<<<< Solved Board >>>>>")
+        solution.print_pretty()
 
     # # sets of moves for the different games
     first_moves = [
@@ -332,11 +360,17 @@ if __name__ == "__main__":
         g.update(trip[0],trip[1],trip[2])
     g.print_pretty()
     print(g)
-    print(g.find_most_constrained_cell())
-    print(g.failure_test())
-    g.rows[6][3] = []
-    print(g.find_most_constrained_cell())
-    print(g.failure_test())
+    # g.rows[5][3] = []
+    # print(g.find_most_constrained_cell())
+    # print(g.failure_test())
+    sol = DFS(g)
+    print(sol)
+    sol.print_pretty()
+    # print(g.find_most_constrained_cell())
+    # print(g.failure_test())
+    # g.rows[6][3] = []
+    # print(g.find_most_constrained_cell())
+    # print(g.failure_test())
 
     # #From the above print statement, you can see which numbers
     # #  have been assigned to the board, and then create test
