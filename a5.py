@@ -185,10 +185,12 @@ def DFS(state: Board) -> Board:
         either None in the case of invalid input or a solved board
     """
     the_stack = Stack([state])
+    count = 0
     print(the_stack)
     while not the_stack.is_empty():
         print(the_stack)
         curr = the_stack.pop()
+        count += 1
         if curr.goal_test():
             return curr
         elif not curr.failure_test():
@@ -199,11 +201,6 @@ def DFS(state: Board) -> Board:
                 cpy.update(row, column, sel)
                 print(row, column, sel)
                 the_stack.push(cpy)
-    return None 
-    
-
-
-
     return None 
 
 
@@ -221,7 +218,24 @@ def BFS(state: Board) -> Board:
     Returns:
         either None in the case of invalid input or a solved board
     """
-    
+    the_queue = Queue([state])
+    count = 1
+    print(the_queue)
+    while not the_queue.is_empty():
+        print(the_queue)
+        curr = the_queue.pop()
+        count += 1
+        if curr.goal_test():
+            return curr
+        elif not curr.failure_test():
+            row, column = curr.find_most_constrained_cell()
+            mcc = curr.rows[row][column]
+            for sel in mcc: 
+                cpy = copy.deepcopy(curr)
+                cpy.update(row, column, sel)
+                print(row, column, sel)
+                the_queue.push(cpy)
+    return None 
 
 
 if __name__ == "__main__":
